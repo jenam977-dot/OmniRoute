@@ -1,8 +1,8 @@
 // Downloads the encrypted state file, decrypts it (AES-256-CBC, PBKDF2-SHA256),
 // and writes it to $DATA_DIR/storage.sqlite. Exits 0 on success, 1 on failure.
 // The matching encryption is: salt(16) + iv(16) + ciphertext.
-const fs = require("fs");
-const crypto = require("crypto");
+import fs from "fs";
+import crypto from "crypto";
 (async () => {
   const url = process.env.STATE_URL ||
     "https://raw.githubusercontent.com/jenam977-dot/omniroute-state/main/state.sqlite.enc";
@@ -22,3 +22,4 @@ const crypto = require("crypto");
   fs.writeFileSync(dir + "/storage.sqlite", out);
   console.log("[boot-restore] wrote " + out.length + " bytes to " + dir + "/storage.sqlite");
 })().catch((e) => { console.error("[boot-restore] FAILED: " + e.message); process.exit(1); });
+
