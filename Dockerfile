@@ -286,10 +286,16 @@ USER node
 COPY --chmod=755 scripts/check-permissions.sh /app/check-permissions.sh
 ENTRYPOINT ["/app/check-permissions.sh"]
 
+# Boot-time database restore: on hosts with ephemeral filesystems (e.g. Render
+# free tier) every restart wipes storage.sqlite. This restores it from the
+# encrypted state file before the app starts (no-op if the state file or the
+# STATE_PASSPHRASE env var is missing).
+COPY --chmod=755 docker/boot-restore.sh /app/boot-restore.sh
+COPY docker/boot-restore.mjs /app/boot-restore.mjs
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD ["node", "healthcheck.mjs"]
 
-CMD ["node", "dev/run-standalone.mjs"]
+CMD ["/app/boot-restore.sh"]
 
 # ── Runner Web (web-cookie providers: Gemini Web, Claude Turnstile) ───────────
 #
